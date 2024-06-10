@@ -1,0 +1,27 @@
+name: "Test"
+on:
+  pull_request:
+  push:
+jobs:
+  doallTests:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        # os: [macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v27
+      with:
+        nix_path: nixpkgs=channel:nixos-unstable
+    - name: testbuild
+      run: |
+        # nix-shell -p git --run 'git clone h 1 https://github.com/NixOS/nixpkgs newnix'
+        # cd newnix
+        # nix-shell -p git --run 'git reset --hard 68ead29211bb9890f494af3a8b5643a831d9d4c4'
+        # nix-shell -p git --run 'git log|head -n 20|cat'
+        nix-shell -p git --run 'git config --global user.name blah; git config --global user.email "blah@example.com"'
+        ls
+        find|head
+        nix-shell -p nixpkgs-review --run "GITHUB_TOKEN=${{secrets.TMPGITHUB}} nixpkgs-review pr 318851"
+        # nix-shell -p git --run 'mkdir newnix; cd newnix; git init; git remote add origin https://github.com/NixOS/nixpkgs; git fetch --depth 1 origin 68ead29211bb9890f494af3a8b5643a831d9d4c4; git checkout FETCH_HEAD'
